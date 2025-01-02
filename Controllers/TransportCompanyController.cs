@@ -25,7 +25,11 @@ namespace BachBinHoangManagement.Controllers
         [HttpGet("GetAll")]
         public async Task<IActionResult> GetAllTransportCompany(
             int pageNumber = 1,
-            int? pageSize = null
+            int? pageSize = null,
+            string? name = null,
+            int? districtId = null,
+            int? provinceId = null,
+            int? serviceId = null
             )
         {
             int actualPageSize = pageSize ?? _paginationSettings.DefaultPageSize;
@@ -35,6 +39,29 @@ namespace BachBinHoangManagement.Controllers
                 .Include(p => p.TransportCompanyServices)
                     .ThenInclude(p => p.Service)
                 .AsQueryable();
+
+            // Thêm các bộ lọc
+            if (!string.IsNullOrEmpty(name))
+            {
+                transportCompany = transportCompany.Where(p => p.Name.Contains(name));
+            }
+
+            if (districtId.HasValue)
+            {
+                transportCompany = transportCompany.Where(p => p.DistrictId == districtId.Value);
+            }
+
+            if (provinceId.HasValue)
+            {
+                transportCompany = transportCompany.Where(p => p.District.ProvinceId == provinceId.Value);
+            }
+
+            if (serviceId.HasValue)
+            {
+                transportCompany = transportCompany
+                    .Where(p => p.TransportCompanyServices
+                        .Any(s => s.ServiceId == serviceId.Value));
+            }
 
             int totalTransportCompanyCount = await transportCompany.CountAsync();
 
