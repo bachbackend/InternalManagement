@@ -1,0 +1,6 @@
+@BachBinHoangManagement_HostAddress = http://localhost:5121
+
+GET {{BachBinHoangManagement_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
